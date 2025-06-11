@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HUB Wordle Challenge — Unlock the Power of Connection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121213;
+      color: #fff;
+      text-align: center;
+      padding: 2em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .grid {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+      justify-content: center;
+    }
+    .tile {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #3a3a3c;
+      background-color: #121213;
+      user-select: none;
+    }
+    .correct {
+      background-color: #538d4e;
+      border-color: #538d4e;
+      color: white;
+    }
+    .present {
+      background-color: #b59f3b;
+      border-color: #b59f3b;
+      color: white;
+    }
+    .absent {
+      background-color: #3a3a3c;
+      border-color: #3a3a3c;
+      color: white;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 18px;
+      text-transform: lowercase;
+      width: 120px;
+      margin: 10px auto;
+      border-radius: 4px;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: none;
+      background-color: #538d4e;
+      color: white;
+    }
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 20px;
+      min-height: 28px;
+    }
+    footer {
+      margin-top: auto;
+      padding-top: 30px;
+    }
+    footer img {
+      max-width: 180px;
+      height: auto;
+      filter: brightness(1.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>HUB Wordle Challenge</h1>
+  <p><em>Crack the code to see why HUB is your smartest, strongest business ally.</em></p>
+  <p>Solve the puzzle to unlock the key benefits that only HUB delivers!</p>
+
+  <div class="grid" id="grid"></div>
+
+  <form onsubmit="submitGuess(event)">
+    <input
+      type="text"
+      id="guess"
+      maxlength="5"
+      required
+      autocomplete="off"
+      autofocus
+      spellcheck="false"
+      pattern="[a-zA-Z]{5}"
+      title="Please enter exactly 5 letters"
+    />
+    <button type="submit">Guess</button>
+  </form>
+
+  <div class="message" id="message"></div>
+
+  <footer>
+    <img
+      src="https://s3.amazonaws.com/images.productionhub.com/profiles/logos/325796_a5mdmymdaw.jpg"
+      alt="HUB International Insurance Broker Logo"
+    />
+  </footer>
+
+  <script>
+    const correctWord = "trust";
+    const maxAttempts = 6;
+    const grid = document.getElementById("grid");
+    const messageDiv = document.getElementById("message");
+    const input = document.getElementById("guess");
+
+    const redirectUrl = "hub.html";  // Redirect to your mock charity event page
+
+    let currentRow = 0;
+    let gameOver = false;
+
+    // Initialize the empty grid (6 rows × 5 tiles)
+    for (let i = 0; i < maxAttempts; i++) {
+      const row = document.createElement("div");
+      row.className = "row";
+      for (let j = 0; j < 5; j++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        row.appendChild(tile);
+      }
+      grid.appendChild(row);
+    }
+
+    function submitGuess(event) {
+      event.preventDefault();
+      if (gameOver) return;
+
+      const guess = input.value.trim().toLowerCase();
+
+      if (guess.length !== 5) {
+        messageDiv.textContent = "❗ Guess must be exactly 5 letters.";
+        return;
+      }
+
+      const row = grid.children[currentRow];
+      const feedback = getFeedback(guess, correctWord);
+
+      for (let i = 0; i < 5; i++) {
+        const tile = row.children[i];
+        tile.textContent = guess[i].toUpperCase();
+        tile.classList.add(feedback[i]);
+      }
+
+      if (guess === correctWord) {
+        messageDiv.textContent = "🎉 Congratulations! You cracked the HUB code!";
+        gameOver = true;
+        input.disabled = true;
+        event.target.querySelector("button").disabled = true;
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 5000);  // <-- Changed delay to 5 seconds
+        return;
+      }
+
+      currentRow++;
+
+      if (currentRow >= maxAttempts) {
+        messageDiv.textContent = `❌ Game over! The correct word was: ${correctWord.toUpperCase()}`;
+        gameOver = true;
+        input.disabled = true;
+        event.target.querySelector("button").disabled = true;
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 5000);  // <-- Changed delay to 5 seconds
+      } else {
+        messageDiv.textContent = "";
+      }
+
+      input.value = "";
+      input.focus();
+    }
+
+    function getFeedback(guess, answer) {
+      const feedback = Array(5).fill("absent");
+      const answerChars = answer.split("");
+      const guessChars = guess.split("");
+
+      // First pass: correct positions
+      for (let i = 0; i < 5; i++) {
+        if (guessChars[i] === answerChars[i]) {
+          feedback[i] = "correct";
+          answerChars[i] = null; // mark used
+        }
+      }
+
+      // Second pass: present letters in wrong position
+      for (let i = 0; i < 5; i++) {
+        if (feedback[i] === "absent") {
+          const index = answerChars.indexOf(guessChars[i]);
+          if (index !== -1) {
+            feedback[i] = "present";
+            answerChars[index] = null; // mark used
+          }
+        }
+      }
+
+      return feedback;
+    }
+  </script>
+</body>
+</html>

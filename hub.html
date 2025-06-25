@@ -1,118 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Join us for a night out at Eataly!</title>
+  <meta charset="UTF-8">
+  <title>HUB Networking Evening at Eataly Flatiron</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7f8;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #fafafa;
       margin: 0;
-      padding: 2em;
+      padding: 0;
       color: #333;
+    }
+    .hero {
+      position: relative;
+      height: 60vh;
+      background: url('hero.jpg') center/cover no-repeat;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
-    header {
-      max-width: 600px;
-      text-align: center;
-      margin-bottom: 2em;
+    .hero h1 {
+      background: rgba(255,255,255,0.8);
+      padding: 0.5em 1em;
+      border-radius: 6px;
+      font-size: 3em;
+      color: #800;
     }
-    header h1 {
-      color: #2a7a2a;
-      font-size: 2.5em;
-      margin-bottom: 0.2em;
-    }
-    header p {
-      font-size: 1.2em;
-      color: #555;
-    }
-    form {
-      background: white;
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       padding: 2em;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      max-width: 400px;
-      width: 100%;
+      gap: 2em;
+    }
+    .info, form {
+      background: #fff;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      max-width: 450px;
+      flex: 1 1 300px;
+    }
+    .info h2 {
+      color: #800;
+      margin-bottom: 0.5em;
+    }
+    .info p {
+      line-height: 1.6;
+      margin-bottom: 1.5em;
     }
     label {
       display: block;
-      margin-bottom: 0.5em;
+      margin: 0.5em 0 0.2em;
       font-weight: 600;
     }
-    input, select, textarea {
+    input, textarea {
       width: 100%;
-      padding: 0.6em;
-      margin-bottom: 1.2em;
+      padding: 0.7em;
+      margin-bottom: 1em;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 5px;
       font-size: 1em;
       box-sizing: border-box;
     }
     button {
-      background-color: #2a7a2a;
-      color: white;
-      padding: 0.75em 1.5em;
+      background-color: #800;
+      color: #fff;
+      padding: 0.8em 2em;
       font-size: 1.1em;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #235e23;
+      background-color: #600;
     }
     .thank-you {
       display: none;
-      font-size: 1.2em;
-      color: #2a7a2a;
-      text-align: center;
       margin-top: 1em;
+      color: #800;
+      font-size: 1.2em;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Eataly</h1>
-    <p>Join us for an unforgettable evening that starts with a brief presentation followed by a pasta makin contest</p>
-  </header>
 
-  <form id="registrationForm">
-    <label for="name">Full Name *</label>
-    <input type="text" id="name" name="name" required placeholder="Your full name" />
+  <section class="hero">
+    <h1>HUB Networking Evening</h1>
+  </section>
 
-    <label for="email">Email Address *</label>
-    <input type="email" id="email" name="email" required placeholder="you@example.com" />
+  <main>
+    <div class="info">
+      <h2>Why Attend?</h2>
+      <p>You're invited to join industry peers for an evening of pasta-making, dining, and conversations with HUB's leadership at <strong>Eataly Flatiron (200 5th Ave, NYC)</strong>. This is a curated opportunity to explore potential synergies and expand your professional network.</p>
 
-    <label for="ticketType">Ticket Type *</label>
-    <select id="ticketType" name="ticketType" required>
-      <option value="" disabled selected>Select ticket</option>
-      <option value="general">General Admission - $50</option>
-      <option value="vip">VIP Admission - $100</option>
-      <option value="sponsor">Sponsor Package - $500</option>
-    </select>
+      <h2>Event Highlights</h2>
+      <ul>
+        <li>Hands-on Italian pasta workshop</li>
+        <li>Cocktail aperitivo & family‑style dinner</li>
+        <li>A curated guest list of select professionals</li>
+      </ul>
 
-    <label for="message">Additional Message</label>
-    <textarea id="message" name="message" rows="3" placeholder="Any special requests or comments"></textarea>
+      <p><em>Dress code:</em> Smart business casual</p>
+    </div>
 
-    <button type="submit">Register Now</button>
-  </form>
+    <form id="rsvpForm" action="https://your-backend.example.com/hub-rsvp" method="post">
+      <label for="name">Full Name *</label>
+      <input type="text" id="name" name="name" required placeholder="Jane Doe">
 
-  <div class="thank-you" id="thankYouMessage">
-    🎉 Thank you for registering! We look forward to seeing you at the event.
-  </div>
+      <label for="email">Work Email *</label>
+      <input type="email" id="email" name="email" required placeholder="jane@company.com">
+
+      <label for="company">Company *</label>
+      <input type="text" id="company" name="company" required placeholder="Company Name">
+
+      <label for="title">Title *</label>
+      <input type="text" id="title" name="title" required placeholder="Your Role">
+
+      <label for="goals">Your Objective (optional)</label>
+      <textarea id="goals" name="goals" rows="3" placeholder="E.g., explore partnerships or learn about X"></textarea>
+
+      <button type="submit">Confirm Attendance</button>
+
+      <div class="thank-you" id="thankYouMessage">
+        🎉 Thank you for RSVPing! We’ll follow up with details soon.
+      </div>
+    </form>
+  </main>
 
   <script>
-    const form = document.getElementById('registrationForm');
-    const thankYou = document.getElementById('thankYouMessage');
-
-    form.addEventListener('submit', (e) => {
+    document.getElementById('rsvpForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      // Here you would normally send the data to a server
-      form.style.display = 'none';
-      thankYou.style.display = 'block';
+      const form = e.target;
+      fetch(form.action, {
+        method: form.method,
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          name: form.name.value,
+          email: form.email.value,
+          company: form.company.value,
+          title: form.title.value,
+          goals: form.goals.value
+        })
+      }).then(res => {
+        if(res.ok) {
+          form.style.display = 'none';
+          document.getElementById('thankYouMessage').style.display = 'block';
+        } else {
+          alert('Submission error, please try again.');
+        }
+      });
     });
   </script>
+
 </body>
 </html>

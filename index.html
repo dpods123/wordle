@@ -2,145 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HUB Wordle Challenge — Unlock the Power of Connection</title>
   <style>
     :root {
-      --vh: 1vh;
+      --color-bg: #121213;
+      --color-text: #fff;
+      --color-correct: #538d4e;
+      --color-present: #b59f3b;
+      --color-absent: #3a3a3c;
+      --color-panel-bg: rgba(40, 40, 40, 0.95);
+      --color-panel-shadow: rgba(0, 0, 0, 0.6);
+      --color-win: #2e7d32;   /* nice green */
+      --color-lose: #c62828;  /* nice red */
+      --input-glow: rgba(46, 125, 50, 0.3); /* subtle green glow */
+    }
+
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
     }
 
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #121213;
-      color: #fff;
-      text-align: center;
-      padding: 2em;
-      height: calc(var(--vh, 1vh) * 100);
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       overflow-x: hidden;
     }
 
-    h1 {
-      font-size: 2em;
+    /* Container for main content + sidebar */
+    .container {
+      display: flex;
+      flex-direction: row;
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5em 1em 2em;
+      gap: 1.5em;
+      flex-wrap: nowrap;
     }
 
+    /* Left side: game + header */
+    .main-content {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0; /* for flexbox shrinking */
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.25em;
+      user-select: none;
+    }
+
+    p.emphasis {
+      font-style: italic;
+      margin-top: 0;
+      margin-bottom: 0.25em;
+      user-select: none;
+      font-weight: 500;
+    }
+
+    p.description {
+      margin-top: 0;
+      margin-bottom: 1.2em;
+      user-select: none;
+      color: #ccc;
+    }
+
+    /* Grid container */
     .grid {
       display: grid;
       grid-template-rows: repeat(4, 1fr);
       gap: 10px;
-      margin-bottom: 20px;
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 1.2em;
     }
 
+    /* Each row of 5 tiles */
     .row {
       display: grid;
-      grid-template-columns: repeat(5, 60px);
-      gap: 5px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
       justify-content: center;
     }
 
+    /* Each tile */
     .tile {
       width: 60px;
       height: 60px;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       text-transform: uppercase;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid #3a3a3c;
-      background-color: #121213;
+      border: 2px solid var(--color-absent);
+      background-color: var(--color-bg);
       user-select: none;
-      transition: transform 0.3s ease, background-color 0.3s ease;
+      border-radius: 8px;
+      transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
       transform-origin: center;
+      color: var(--color-text);
+      perspective: 1000px;
     }
 
+    /* Color feedback */
     .correct {
-      background-color: #538d4e;
-      border-color: #538d4e;
+      background-color: var(--color-correct);
+      border-color: var(--color-correct);
       color: white;
     }
 
     .present {
-      background-color: #b59f3b;
-      border-color: #b59f3b;
+      background-color: var(--color-present);
+      border-color: var(--color-present);
       color: white;
     }
 
     .absent {
-      background-color: #3a3a3c;
-      border-color: #3a3a3c;
+      background-color: var(--color-absent);
+      border-color: var(--color-absent);
       color: white;
     }
 
-    input[type="text"] {
-      padding: 10px;
-      font-size: 18px;
-      text-transform: lowercase;
-      width: 140px;
-      margin: 10px auto;
-      border-radius: 4px;
-      border: none;
-      outline: none;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-left: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-      border: none;
-      background-color: #538d4e;
-      color: white;
-    }
-
-    button:disabled {
-      background-color: #555;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 20px;
-      font-size: 18px;
-      min-height: 28px;
-    }
-
-    .redirect-msg {
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-      margin-top: 10px;
-      font-size: 16px;
-      color: #ccc;
-    }
-
-    .redirect-msg.show {
-      opacity: 1;
-    }
-
-    footer {
-      margin-top: auto;
-      padding-top: 30px;
-    }
-
-    footer img {
-      max-width: 180px;
-      height: auto;
-      filter: brightness(1.2);
-    }
-
-    /* Flip Animation */
+    /* Flip animation */
     @keyframes flip {
       0% {
         transform: rotateX(0deg);
-        background-color: #121213;
+        background-color: var(--color-bg);
+        color: var(--color-text);
       }
       50% {
         transform: rotateX(90deg);
-        background-color: #121213;
-        color: #121213;
+        background-color: var(--color-bg);
+        color: var(--color-bg);
       }
       100% {
         transform: rotateX(0deg);
@@ -151,113 +155,274 @@
       animation: flip 0.6s ease forwards;
       transform-style: preserve-3d;
       backface-visibility: hidden;
-      perspective: 1000px;
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 1em;
-      }
+    /* Input + button form */
+    form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75em;
+      margin-bottom: 0.8em;
+      flex-wrap: wrap;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-      h1 {
-        font-size: 1.5em;
-      }
+    input[type="text"] {
+      padding: 10px 12px;
+      font-size: 18px;
+      text-transform: lowercase;
+      width: 140px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      text-align: center;
+      box-shadow: 0 0 6px 2px transparent;
+      transition: box-shadow 0.6s ease;
+    }
 
-      .row {
-        grid-template-columns: repeat(5, 14vw);
-        gap: 4px;
-      }
+    /* Subtle green glow on input */
+    input[type="text"]:focus {
+      box-shadow: 0 0 6px 2px var(--input-glow);
+    }
 
-      .tile {
-        font-size: 5vw;
-        width: 14vw;
-        height: 14vw;
-        max-width: 60px;
-        max-height: 60px;
-      }
+    button {
+      padding: 10px 22px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background-color: var(--color-correct);
+      color: white;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
 
-      input[type="text"] {
-        width: 100px;
+    button:hover:not(:disabled) {
+      background-color: #3f6b33;
+    }
+
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+
+    /* Sidebar container for logo + messages */
+    .sidebar {
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2.5em;
+      min-width: 280px;
+      position: relative;
+    }
+
+    /* HUB logo aligned left */
+    footer {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      user-select: none;
+      padding-top: 5px;
+    }
+
+    footer img {
+      max-width: 180px;
+      height: auto;
+      filter: brightness(1.2);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(83, 141, 78, 0.5);
+      transition: filter 0.3s ease;
+    }
+
+    footer img:hover {
+      filter: brightness(1.5);
+      cursor: pointer;
+    }
+
+    /* Messages panel (win/lose and redirect) */
+    .message-panel {
+      background: var(--color-panel-bg);
+      box-shadow: 0 0 12px var(--color-panel-shadow);
+      border-radius: 12px;
+      width: 100%;
+      min-height: 90px;
+      color: #eee;
+      font-size: 18px;
+      padding: 1.2em 1.4em;
+      opacity: 0;
+      transform: translateX(150%);
+      transition: 
+        transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+        opacity 0.5s ease,
+        background-color 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      user-select: none;
+      pointer-events: none;
+      text-align: left;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* Show message panel with color variant */
+    .message-panel.show {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .message-panel.win {
+      background-color: var(--color-win);
+      box-shadow: 0 0 15px 3px rgba(46, 125, 50, 0.7);
+      color: white;
+    }
+
+    .message-panel.lose {
+      background-color: var(--color-lose);
+      box-shadow: 0 0 15px 3px rgba(198, 40, 40, 0.7);
+      color: white;
+    }
+
+    /* Smaller font for redirect message inside */
+    .redirect-msg {
+      margin-top: 0.6em;
+      font-size: 14px;
+      color: #ddd;
+      font-style: italic;
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      .container {
+        flex-direction: column;
+        padding: 1em 1em 2em;
+        max-width: 100%;
+      }
+      .sidebar {
+        width: 100%;
+        min-width: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1em;
+        margin-top: 1.5em;
+      }
+      .message-panel {
+        width: auto;
+        min-height: 80px;
         font-size: 16px;
+        padding: 1em 1.2em;
+        flex: 1;
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
       }
-
-      button {
-        font-size: 14px;
-        padding: 8px 16px;
-      }
-
-      .message {
-        font-size: 16px;
-      }
-
       footer img {
         max-width: 140px;
       }
+      form {
+        max-width: 280px;
+        gap: 0.5em;
+      }
+      .grid {
+        max-width: 100%;
+        width: 100%;
+      }
+      .tile {
+        width: 12vw;
+        height: 12vw;
+        font-size: 6vw;
+        max-width: 60px;
+        max-height: 60px;
+      }
     }
+
   </style>
 </head>
 <body>
-  <h1>HUB Wordle Challenge</h1>
-  <p><em>Crack the code to see why HUB is your smartest, strongest business ally.</em></p>
-  <p>Solve the puzzle to unlock the key benefits that only HUB delivers!</p>
+  <div class="container">
+    <main class="main-content">
+      <h1>HUB Wordle Challenge</h1>
+      <p class="emphasis">Crack the code to see why HUB is your smartest, strongest business ally.</p>
+      <p class="description">Solve the puzzle to unlock the key benefits that only HUB delivers!</p>
 
-  <div class="grid" id="grid"></div>
+      <div class="grid" id="grid" aria-label="Wordle grid" role="list"></div>
 
-  <form onsubmit="submitGuess(event)">
-    <input
-      type="text"
-      id="guess"
-      maxlength="5"
-      required
-      autocomplete="off"
-      autofocus
-      spellcheck="false"
-      pattern="[a-zA-Z]{5}"
-      title="Please enter exactly 5 letters"
-    />
-    <button type="submit">Guess</button>
-  </form>
+      <form onsubmit="submitGuess(event)" aria-label="Word guess form">
+        <input
+          type="text"
+          id="guess"
+          maxlength="5"
+          required
+          autocomplete="off"
+          autofocus
+          spellcheck="false"
+          pattern="[a-zA-Z]{5}"
+          title="Please enter exactly 5 letters"
+          aria-describedby="message"
+          aria-required="true"
+        />
+        <button type="submit" id="submitBtn">Guess</button>
+      </form>
+    </main>
 
-  <div class="message" id="message"></div>
-  <div class="redirect-msg" id="redirect-msg">🔗 Redirecting you to learn more about HUB...</div>
-
-  <footer>
-    <img
-      src="https://s3.amazonaws.com/images.productionhub.com/profiles/logos/325796_a5mdmymdaw.jpg"
-      alt="HUB International Insurance Broker Logo"
-    />
-  </footer>
+    <aside class="sidebar" aria-live="polite" aria-atomic="true">
+      <div class="message-panel" id="message" aria-live="assertive">
+        <!-- win/lose message -->
+        <span id="game-message"></span>
+        <!-- redirect message -->
+        <span class="redirect-msg" id="redirect-msg">🔗 Redirecting you to learn more about HUB...</span>
+      </div>
+      <footer>
+        <img
+          src="https://s3.amazonaws.com/images.productionhub.com/profiles/logos/325796_a5mdmymdaw.jpg"
+          alt="HUB International Insurance Broker Logo"
+          loading="lazy"
+          tabindex="-1"
+        />
+      </footer>
+    </aside>
+  </div>
 
   <script>
-    // Handle viewport height correctly on mobile
-    function setVh() {
-      let vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-    setVh();
-    window.addEventListener('resize', setVh);
-
     const correctWord = "trust";
     const maxAttempts = 4;
     const grid = document.getElementById("grid");
-    const messageDiv = document.getElementById("message");
-    const input = document.getElementById("guess");
+    const messagePanel = document.getElementById("message");
+    const gameMessage = document.getElementById("game-message");
     const redirectMsg = document.getElementById("redirect-msg");
+    const input = document.getElementById("guess");
+    const submitBtn = document.getElementById("submitBtn");
+
     const redirectUrl = "hub.html";
 
     let currentRow = 0;
     let gameOver = false;
 
+    // Initialize grid rows and tiles
     for (let i = 0; i < maxAttempts; i++) {
       const row = document.createElement("div");
       row.className = "row";
+      row.setAttribute("role", "listitem");
       for (let j = 0; j < 5; j++) {
         const tile = document.createElement("div");
         tile.className = "tile";
+        tile.setAttribute("aria-label", "empty tile");
         row.appendChild(tile);
       }
       grid.appendChild(row);
     }
+
+    // Hide message panel initially
+    messagePanel.classList.remove("show");
+    redirectMsg.style.display = "none";
 
     function submitGuess(event) {
       event.preventDefault();
@@ -266,24 +431,30 @@
       const guess = input.value.trim().toLowerCase();
 
       if (guess.length !== 5) {
-        messageDiv.textContent = "❗ Guess must be exactly 5 letters.";
+        showTemporaryMessage("❗ Guess must be exactly 5 letters.");
         return;
       }
 
       const row = grid.children[currentRow];
       const feedback = getFeedback(guess, correctWord);
 
+      // Reveal tiles with flip animation & feedback colors
       for (let i = 0; i < 5; i++) {
         const tile = row.children[i];
         tile.textContent = guess[i].toUpperCase();
+
+        // Remove previous classes to retrigger animation if needed
+        tile.classList.remove("flip", "correct", "present", "absent");
+
         setTimeout(() => {
           tile.classList.add("flip");
           tile.classList.add(feedback[i]);
+          tile.setAttribute("aria-label", `${guess[i].toUpperCase()} is ${feedback[i]}`);
         }, i * 300);
       }
 
       if (guess === correctWord) {
-        messageDiv.textContent = "🎉 Congratulations! You cracked the HUB code!";
+        showMessage("🎉 Congratulations! You cracked the HUB code!", true);
         showRedirectMessage();
         endGame();
         return;
@@ -292,50 +463,84 @@
       currentRow++;
 
       if (currentRow >= maxAttempts) {
-        messageDiv.textContent = `❌ Game over! The correct word was: ${correctWord.toUpperCase()}`;
+        showMessage(`❌ Game over! The correct word was: ${correctWord.toUpperCase()}`, false);
         showRedirectMessage();
         endGame();
-      } else {
-        messageDiv.textContent = "";
       }
 
       input.value = "";
       input.focus();
     }
 
-    function showRedirectMessage() {
-      setTimeout(() => {
-        redirectMsg.classList.add("show");
-      }, 1500);
+    // Show message with green (win) or red (lose) panel background
+    function showMessage(text, win = null) {
+      gameMessage.textContent = text;
+      messagePanel.classList.add("show");
+
+      // Remove any previous win/lose classes
+      messagePanel.classList.remove("win", "lose");
+
+      if (win === true) {
+        messagePanel.classList.add("win");
+      } else if (win === false) {
+        messagePanel.classList.add("lose");
+      }
     }
 
+    // Show temporary message under the input for invalid guesses (not game ending)
+    function showTemporaryMessage(text) {
+      gameMessage.textContent = text;
+      // Show for 2 seconds but no color panel or permanent box
+      messagePanel.classList.add("show");
+      messagePanel.classList.remove("win", "lose");
+      redirectMsg.style.display = "none";
+
+      setTimeout(() => {
+        if (!gameOver) {
+          messagePanel.classList.remove("show");
+          gameMessage.textContent = "";
+        }
+      }, 2000);
+    }
+
+    // Show the redirect message below main message
+    function showRedirectMessage() {
+      redirectMsg.style.display = "block";
+    }
+
+    // End game disables input and submit button
     function endGame() {
       gameOver = true;
       input.disabled = true;
-      document.querySelector("button").disabled = true;
+      submitBtn.disabled = true;
+      // Optionally redirect after 4 seconds
       setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 5000);
+      }, 4000);
     }
 
+    // Return feedback for guess letters: 'correct', 'present', or 'absent'
     function getFeedback(guess, answer) {
       const feedback = Array(5).fill("absent");
-      const answerChars = answer.split("");
-      const guessChars = guess.split("");
+      const answerLetters = answer.split("");
+      const guessLetters = guess.split("");
 
+      // First pass: correct letters
       for (let i = 0; i < 5; i++) {
-        if (guessChars[i] === answerChars[i]) {
+        if (guessLetters[i] === answerLetters[i]) {
           feedback[i] = "correct";
-          answerChars[i] = null;
+          answerLetters[i] = null; // remove matched letter
+          guessLetters[i] = null;
         }
       }
 
+      // Second pass: present letters
       for (let i = 0; i < 5; i++) {
-        if (feedback[i] === "absent") {
-          const index = answerChars.indexOf(guessChars[i]);
-          if (index !== -1) {
+        if (guessLetters[i] !== null) {
+          const index = answerLetters.indexOf(guessLetters[i]);
+          if (index > -1) {
             feedback[i] = "present";
-            answerChars[index] = null;
+            answerLetters[index] = null;
           }
         }
       }
@@ -343,12 +548,12 @@
       return feedback;
     }
 
-    // Scroll input into view on focus (iOS fix)
-    input.addEventListener("focus", () => {
-      setTimeout(() => {
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 300);
-    });
+    // On page load: hide message panel and focus input
+    window.onload = () => {
+      messagePanel.classList.remove("show");
+      redirectMsg.style.display = "none";
+      input.focus();
+    };
   </script>
 </body>
 </html>

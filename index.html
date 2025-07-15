@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HUB Wordle Challenge — Unlock the Power of Connection</title>
   <style>
     body {
@@ -15,21 +16,28 @@
       flex-direction: column;
       justify-content: flex-start;
     }
+
+    h1 {
+      font-size: 2em;
+    }
+
     .grid {
       display: grid;
       grid-template-rows: repeat(4, 1fr);
       gap: 10px;
       margin-bottom: 20px;
     }
+
     .row {
       display: grid;
-      grid-template-columns: repeat(5, 50px);
+      grid-template-columns: repeat(5, 60px);
       gap: 5px;
       justify-content: center;
     }
+
     .tile {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       font-size: 24px;
       font-weight: bold;
       text-transform: uppercase;
@@ -39,33 +47,40 @@
       border: 2px solid #3a3a3c;
       background-color: #121213;
       user-select: none;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      transform-origin: center;
     }
+
     .correct {
       background-color: #538d4e;
       border-color: #538d4e;
       color: white;
     }
+
     .present {
       background-color: #b59f3b;
       border-color: #b59f3b;
       color: white;
     }
+
     .absent {
       background-color: #3a3a3c;
       border-color: #3a3a3c;
       color: white;
     }
+
     input[type="text"] {
       padding: 10px;
       font-size: 18px;
       text-transform: lowercase;
-      width: 120px;
+      width: 140px;
       margin: 10px auto;
       border-radius: 4px;
       border: none;
       outline: none;
       text-align: center;
     }
+
     button {
       padding: 10px 20px;
       font-size: 16px;
@@ -76,23 +91,104 @@
       background-color: #538d4e;
       color: white;
     }
+
     button:disabled {
       background-color: #555;
       cursor: not-allowed;
     }
+
     .message {
       margin-top: 20px;
-      font-size: 20px;
+      font-size: 18px;
       min-height: 28px;
     }
+
+    .redirect-msg {
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      margin-top: 10px;
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .redirect-msg.show {
+      opacity: 1;
+    }
+
     footer {
       margin-top: auto;
       padding-top: 30px;
     }
+
     footer img {
       max-width: 180px;
       height: auto;
       filter: brightness(1.2);
+    }
+
+    /* Flip Animation */
+    @keyframes flip {
+      0% {
+        transform: rotateX(0deg);
+        background-color: #121213;
+      }
+      50% {
+        transform: rotateX(90deg);
+        background-color: #121213;
+        color: #121213;
+      }
+      100% {
+        transform: rotateX(0deg);
+      }
+    }
+
+    .tile.flip {
+      animation: flip 0.6s ease forwards;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+
+    /* 🌐 Responsive for Mobile / iPhone */
+    @media (max-width: 600px) {
+      body {
+        padding: 1em;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      .row {
+        grid-template-columns: repeat(5, 14vw);
+        gap: 4px;
+      }
+
+      .tile {
+        font-size: 5vw;
+        width: 14vw;
+        height: 14vw;
+        max-width: 60px;
+        max-height: 60px;
+      }
+
+      input[type="text"] {
+        width: 100px;
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      .message {
+        font-size: 16px;
+      }
+
+      footer img {
+        max-width: 140px;
+      }
     }
   </style>
 </head>
@@ -119,6 +215,7 @@
   </form>
 
   <div class="message" id="message"></div>
+  <div class="redirect-msg" id="redirect-msg">🔗 Redirecting you to learn more about HUB...</div>
 
   <footer>
     <img
@@ -133,13 +230,13 @@
     const grid = document.getElementById("grid");
     const messageDiv = document.getElementById("message");
     const input = document.getElementById("guess");
+    const redirectMsg = document.getElementById("redirect-msg");
 
-    const redirectUrl = "hub.html";  // Redirect to your mock charity event page
+    const redirectUrl = "hub.html";
 
     let currentRow = 0;
     let gameOver = false;
 
-    // Initialize the empty grid (4 rows × 5 tiles)
     for (let i = 0; i < maxAttempts; i++) {
       const row = document.createElement("div");
       row.className = "row";
@@ -168,17 +265,17 @@
       for (let i = 0; i < 5; i++) {
         const tile = row.children[i];
         tile.textContent = guess[i].toUpperCase();
-        tile.classList.add(feedback[i]);
+
+        setTimeout(() => {
+          tile.classList.add("flip");
+          tile.classList.add(feedback[i]);
+        }, i * 300);
       }
 
       if (guess === correctWord) {
         messageDiv.textContent = "🎉 Congratulations! You cracked the HUB code!";
-        gameOver = true;
-        input.disabled = true;
-        event.target.querySelector("button").disabled = true;
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 5000);  // <-- Changed delay to 5 seconds
+        showRedirectMessage();
+        endGame();
         return;
       }
 
@@ -186,12 +283,8 @@
 
       if (currentRow >= maxAttempts) {
         messageDiv.textContent = `❌ Game over! The correct word was: ${correctWord.toUpperCase()}`;
-        gameOver = true;
-        input.disabled = true;
-        event.target.querySelector("button").disabled = true;
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 5000);  // <-- Changed delay to 5 seconds
+        showRedirectMessage();
+        endGame();
       } else {
         messageDiv.textContent = "";
       }
@@ -200,26 +293,39 @@
       input.focus();
     }
 
+    function showRedirectMessage() {
+      setTimeout(() => {
+        redirectMsg.classList.add("show");
+      }, 1500);
+    }
+
+    function endGame() {
+      gameOver = true;
+      input.disabled = true;
+      document.querySelector("button").disabled = true;
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 5000);
+    }
+
     function getFeedback(guess, answer) {
       const feedback = Array(5).fill("absent");
       const answerChars = answer.split("");
       const guessChars = guess.split("");
 
-      // First pass: correct positions
       for (let i = 0; i < 5; i++) {
         if (guessChars[i] === answerChars[i]) {
           feedback[i] = "correct";
-          answerChars[i] = null; // mark used
+          answerChars[i] = null;
         }
       }
 
-      // Second pass: present letters in wrong position
       for (let i = 0; i < 5; i++) {
         if (feedback[i] === "absent") {
           const index = answerChars.indexOf(guessChars[i]);
           if (index !== -1) {
             feedback[i] = "present";
-            answerChars[index] = null; // mark used
+            answerChars[index] = null;
           }
         }
       }

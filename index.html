@@ -21,6 +21,9 @@
     /* Reset & base */
     * {
       box-sizing: border-box;
+      /* Add these for better font rendering consistency if needed */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
@@ -33,6 +36,8 @@
       flex-direction: column;
       justify-content: flex-start;
       overflow-x: hidden;
+      /* Prevent unwanted scaling/zooming on orientation change on some mobiles */
+      -webkit-text-size-adjust: 100%;
     }
 
     /* Container for main content + sidebar */
@@ -54,6 +59,8 @@
       flex-direction: column;
       align-items: center;
       min-width: 0; /* for flexbox shrinking */
+      /* Add padding-bottom to ensure space below grid, preventing keyboard overlap */
+      padding-bottom: 20vh; /* Adjust as needed, makes sure content has room to scroll */
     }
 
     h1 {
@@ -113,6 +120,8 @@
       transform-origin: center;
       color: var(--color-text);
       perspective: 1000px;
+      /* Explicit line-height for desktop for consistency */
+      line-height: 60px; /* Make line-height equal to height for perfect vertical centering */
     }
 
     /* Color feedback */
@@ -181,6 +190,8 @@
       text-align: center;
       box-shadow: 0 0 6px 2px transparent;
       transition: box-shadow 0.6s ease;
+      background-color: #333; /* Darker background for contrast */
+      color: var(--color-text);
     }
 
     /* Subtle green glow on input */
@@ -254,26 +265,31 @@
       color: #eee;
       font-size: 18px;
       padding: 1.2em 1.4em;
-      opacity: 0; /* Hidden by default */
-      transform: translateX(150%); /* Off-screen by default */
-      transition: 
-        transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+      /* Crucial: Ensure it's truly off-screen when hidden */
+      opacity: 0;
+      pointer-events: none; /* Make it unclickable when hidden */
+      position: absolute; /* Take it out of normal flow */
+      top: 0;
+      left: 150%; /* Start far off-screen */
+      transform: translateX(0); /* Reset transform for 'show' class animation */
+      transition:
         opacity 0.5s ease,
+        left 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
         background-color 0.5s ease;
       display: flex;
       flex-direction: column;
       justify-content: center;
       user-select: none;
-      pointer-events: none;
       text-align: left;
       font-weight: 600;
       line-height: 1.4;
+      z-index: 100; /* Ensure it's above other content when visible */
     }
 
     /* Show message panel with color variant */
     .message-panel.show {
       opacity: 1;
-      transform: translateX(0);
+      left: 0; /* Slide in from left */
       pointer-events: auto;
     }
 
@@ -304,69 +320,93 @@
         flex-direction: column;
         padding: 1em 1em 2em;
         max-width: 100%;
+        gap: 1em; /* Reduce gap on mobile */
+      }
+      .main-content {
+        padding-bottom: 2em; /* Reduced padding for mobile to allow more screen space */
       }
       .sidebar {
         width: 100%;
         min-width: auto;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center; /* Center items on mobile */
         align-items: center;
         gap: 1em;
         margin-top: 1.5em;
-        /* Adjusted order for better flow when keyboard is up */
         flex-wrap: wrap; /* Allow items to wrap */
+        position: relative; /* Make sidebar a positioning context for panel */
+        min-height: 100px; /* Ensure sidebar has some height even if panel is hidden */
       }
       .message-panel {
-        /* On mobile, let JS control its visibility just like desktop */
-        /* Removed !important overrides */
-        /* The default opacity: 0 and transform: translateX(150%) will apply */
-        /* It will only show when .show class is added by JS */
-        order: 1; /* Place message panel before footer */
-        flex: 1 1 auto; /* Allow it to grow/shrink based on space */
-        min-width: 200px; /* Ensure it has a minimum width */
+        /* Mobile specific positioning */
+        position: absolute; /* Keep it absolute within sidebar */
+        top: 0;
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Adjust to truly center */
+        width: 90vw; /* Take most of viewport width */
+        max-width: 350px; /* Limit max size */
+        min-height: 80px;
         font-size: 16px;
         padding: 1em 1.2em;
+        opacity: 0; /* Hidden by default */
+        pointer-events: none;
+        transition:
+          opacity 0.5s ease,
+          transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+          background-color 0.5s ease;
       }
+      .message-panel.show {
+        opacity: 1;
+        transform: translateX(-50%); /* Stays centered */
+        pointer-events: auto;
+      }
+
       footer {
-        order: 2; /* Place footer after message panel */
+        width: 100%; /* Take full width on mobile */
+        display: flex;
+        justify-content: center; /* Center logo horizontally */
+        align-items: center;
+        margin-top: 1em; /* Add space below if message panel is above */
       }
       footer img {
         max-width: 140px;
-        margin-left: auto; /* Push logo to the right if space allows */
+        filter: brightness(1.2); /* Re-apply filter if needed, just for safety */
+        box-shadow: 0 0 8px rgba(83, 141, 78, 0.5); /* Smaller shadow on mobile */
+        margin-left: 0; /* Override auto-margin from previous attempt */
       }
       form {
         max-width: 280px;
         gap: 0.5em;
-        margin-top: 1em; /* Add some space above the form */
+        margin-top: 1.5em; /* More space above the form */
+        margin-bottom: 0.5em; /* Less space below */
       }
 
-      /* --- MODIFIED GRID AND TILE STYLES FOR MOBILE --- */
+      /* --- CRITICAL: REVISED GRID AND TILE STYLES FOR MOBILE --- */
       .grid {
-        width: 90vw; 
-        max-width: 320px; 
+        width: 90vw; /* Take 90% of viewport width */
+        max-width: 300px; /* Limit the max width for the grid */
         margin-left: auto;
         margin-right: auto;
-        gap: 8px; 
+        gap: 6px; /* Reduced gap for a tighter look on mobile */
       }
 
       .row {
-        display: grid; 
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px; 
+        gap: 6px; /* Match row gap with grid gap */
       }
 
       .tile {
-        width: auto; 
-        height: 0; 
-        padding-bottom: 100%; 
-        font-size: 6vw; 
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        max-width: 60px; 
-        max-height: 60px; 
+        /* Directly set vw based size for width and height */
+        /* Calculation: (Grid width - (4 * gap)) / 5 tiles */
+        /* Example: (90vw - (4 * 6px)) / 5 = 18vw - 4.8px. A simpler vw value: */
+        width: 16.5vw; /* Adjusted for better fit, considering gaps */
+        height: 16.5vw; /* Maintain square aspect ratio */
+        font-size: 6vw; /* Scale font size with tile size */
+        line-height: 16.5vw; /* Match line-height to tile height for vertical centering */
+        /* Ensure it doesn't exceed desktop tile size */
+        max-width: 54px;
+        max-height: 54px;
+        font-size: 26px; /* Set a fixed font size if vw proves problematic. Test with 6vw first. */
+        line-height: 54px; /* Adjust line-height if using fixed font size */
       }
     }
   </style>
@@ -423,6 +463,7 @@
     const redirectMsg = document.getElementById("redirect-msg");
     const input = document.getElementById("guess");
     const submitBtn = document.getElementById("submitBtn");
+    const mainContent = document.querySelector('.main-content'); // Get main content area
 
     const redirectUrl = "hub.html";
 
@@ -466,11 +507,12 @@
       input.disabled = true;
       submitBtn.disabled = true;
 
-      // Ensure we scroll to the grid if the keyboard pushes it out of view
-      // This is a common mobile issue workaround
-      if (window.innerWidth <= 720) { // Only for mobile viewports
-          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll the main content (or grid) into view if needed after guess
+      // This helps counteract keyboard pushing up content
+      if (window.innerWidth <= 720) {
+          mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+
 
       // Reveal letter-by-letter with delay
       for (let i = 0; i < 5; i++) {
@@ -526,7 +568,7 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(won ? "win" : "lose");
 
-      // Ensure the message panel is visible
+      // Scroll to message panel if it's not fully in view on mobile
       if (window.innerWidth <= 720) {
         messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -543,24 +585,23 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(type);
 
-      // Ensure the message panel is visible
+      // Scroll to message panel if it's not fully in view on mobile
       if (window.innerWidth <= 720) {
         messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
       setTimeout(() => {
-        gameMessage.textContent = "";
+        // Hide the message after the temporary duration
         messagePanel.classList.remove("show", type);
+        gameMessage.textContent = ""; // Clear message text
       }, 3000);
     }
 
     // Optional: Add event listener to scroll to input on focus for mobile
-    // This helps if the initial focus still causes an issue
     input.addEventListener('focus', () => {
       if (window.innerWidth <= 720) {
-        // Scroll the form into view, which should bring the input with it
-        // Or scroll the grid to ensure the game area is seen
-        document.querySelector('form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Scroll the form into view. The grid is above, so this will usually keep it visible.
+        document.querySelector('form').scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
     });
 

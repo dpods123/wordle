@@ -254,8 +254,8 @@
       color: #eee;
       font-size: 18px;
       padding: 1.2em 1.4em;
-      opacity: 0;
-      transform: translateX(150%);
+      opacity: 0; /* Hidden by default */
+      transform: translateX(150%); /* Off-screen by default */
       transition: 
         transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
         opacity 0.5s ease,
@@ -313,59 +313,60 @@
         align-items: center;
         gap: 1em;
         margin-top: 1.5em;
+        /* Adjusted order for better flow when keyboard is up */
+        flex-wrap: wrap; /* Allow items to wrap */
       }
       .message-panel {
-        width: auto;
-        min-height: 80px;
+        /* On mobile, let JS control its visibility just like desktop */
+        /* Removed !important overrides */
+        /* The default opacity: 0 and transform: translateX(150%) will apply */
+        /* It will only show when .show class is added by JS */
+        order: 1; /* Place message panel before footer */
+        flex: 1 1 auto; /* Allow it to grow/shrink based on space */
+        min-width: 200px; /* Ensure it has a minimum width */
         font-size: 16px;
         padding: 1em 1.2em;
-        flex: 1;
-        /* Important: Override translateX and opacity for mobile */
-        transform: translateX(0) !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
+      }
+      footer {
+        order: 2; /* Place footer after message panel */
       }
       footer img {
         max-width: 140px;
+        margin-left: auto; /* Push logo to the right if space allows */
       }
       form {
         max-width: 280px;
         gap: 0.5em;
+        margin-top: 1em; /* Add some space above the form */
       }
 
       /* --- MODIFIED GRID AND TILE STYLES FOR MOBILE --- */
       .grid {
-        /* Set a more flexible width for the grid container itself */
-        width: 90vw; /* Takes 90% of viewport width */
-        max-width: 320px; /* But doesn't get wider than 320px on larger mobile views */
+        width: 90vw; 
+        max-width: 320px; 
         margin-left: auto;
         margin-right: auto;
-        /* Use fixed pixel gap for consistency */
-        gap: 8px; /* Consistent gap between rows */
+        gap: 8px; 
       }
 
       .row {
-        display: grid; /* Keep using grid for the row layout */
-        /* Distribute columns evenly with fixed gap */
+        display: grid; 
         grid-template-columns: repeat(5, 1fr);
-        gap: 8px; /* Consistent gap between tiles within a row */
+        gap: 8px; 
       }
 
       .tile {
-        /* Use 'fr' units from grid-template-columns, and set aspect ratio */
-        width: auto; /* Let grid-template-columns determine width */
-        height: 0; /* Set height to 0 initially */
-        padding-bottom: 100%; /* Use padding-bottom trick for square aspect ratio (100% of its width) */
-        font-size: 6vw; /* Scale font size relative to viewport width */
+        width: auto; 
+        height: 0; 
+        padding-bottom: 100%; 
+        font-size: 6vw; 
         
-        /* Re-center content vertically and horizontally within the new 'square' tile */
         display: flex;
         align-items: center;
         justify-content: center;
         
-        /* Ensure max-width/height are still respected as a ceiling */
-        max-width: 60px; /* Prevent tiles from becoming too big on wider mobile views */
-        max-height: 60px; /* Match max-width */
+        max-width: 60px; 
+        max-height: 60px; 
       }
     }
   </style>
@@ -442,7 +443,7 @@
       grid.appendChild(row);
     }
 
-    // Hide message panel initially
+    // Hide message panel initially (ensures it's hidden on load on all devices)
     messagePanel.classList.remove("show");
     redirectMsg.style.display = "none";
 
@@ -464,6 +465,12 @@
       // Disable input while flipping
       input.disabled = true;
       submitBtn.disabled = true;
+
+      // Ensure we scroll to the grid if the keyboard pushes it out of view
+      // This is a common mobile issue workaround
+      if (window.innerWidth <= 720) { // Only for mobile viewports
+          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
 
       // Reveal letter-by-letter with delay
       for (let i = 0; i < 5; i++) {
@@ -519,6 +526,11 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(won ? "win" : "lose");
 
+      // Ensure the message panel is visible
+      if (window.innerWidth <= 720) {
+        messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
       // Redirect after 5 seconds
       setTimeout(() => {
         window.location.href = redirectUrl;
@@ -531,11 +543,27 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(type);
 
+      // Ensure the message panel is visible
+      if (window.innerWidth <= 720) {
+        messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
       setTimeout(() => {
         gameMessage.textContent = "";
         messagePanel.classList.remove("show", type);
       }, 3000);
     }
+
+    // Optional: Add event listener to scroll to input on focus for mobile
+    // This helps if the initial focus still causes an issue
+    input.addEventListener('focus', () => {
+      if (window.innerWidth <= 720) {
+        // Scroll the form into view, which should bring the input with it
+        // Or scroll the grid to ensure the game area is seen
+        document.querySelector('form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
   </script>
 </body>
 </html>

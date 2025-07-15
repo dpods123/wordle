@@ -5,16 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HUB Wordle Challenge — Unlock the Power of Connection</title>
   <style>
+    :root {
+      --vh: 1vh;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #121213;
       color: #fff;
       text-align: center;
       padding: 2em;
-      min-height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      overflow-x: hidden;
     }
 
     h1 {
@@ -149,7 +154,6 @@
       perspective: 1000px;
     }
 
-    /* 🌐 Responsive for Mobile / iPhone */
     @media (max-width: 600px) {
       body {
         padding: 1em;
@@ -225,13 +229,20 @@
   </footer>
 
   <script>
+    // Handle viewport height correctly on mobile
+    function setVh() {
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
+
     const correctWord = "trust";
     const maxAttempts = 4;
     const grid = document.getElementById("grid");
     const messageDiv = document.getElementById("message");
     const input = document.getElementById("guess");
     const redirectMsg = document.getElementById("redirect-msg");
-
     const redirectUrl = "hub.html";
 
     let currentRow = 0;
@@ -265,7 +276,6 @@
       for (let i = 0; i < 5; i++) {
         const tile = row.children[i];
         tile.textContent = guess[i].toUpperCase();
-
         setTimeout(() => {
           tile.classList.add("flip");
           tile.classList.add(feedback[i]);
@@ -332,6 +342,13 @@
 
       return feedback;
     }
+
+    // Scroll input into view on focus (iOS fix)
+    input.addEventListener("focus", () => {
+      setTimeout(() => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    });
   </script>
 </body>
 </html>

@@ -13,7 +13,7 @@
       --color-absent: #3a3a3c;
       --color-panel-bg: rgba(40, 40, 40, 0.95);
       --color-panel-shadow: rgba(0, 0, 0, 0.6);
-      --color-win: #2e7d32;    /* nice green */
+      --color-win: #2e7d32;   /* nice green */
       --color-lose: #c62828;  /* nice red */
       --input-glow: rgba(46, 125, 50, 0.3); /* subtle green glow */
     }
@@ -332,21 +332,15 @@
         gap: 0.5em;
       }
       .grid {
-        width: 90vw; 
-        max-width: 320px; 
-        margin-left: auto;
-        margin-right: auto;
-        gap: 8px; 
-      }
-      .row {
-        gap: 8px; 
+        max-width: 100%;
+        width: 100%;
       }
       .tile {
-        width: 18vw; 
-        height: 18vw; 
-        font-size: 8vw; 
-        max-width: 58px; 
-        max-height: 58px; 
+        width: 12vw;
+        height: 12vw;
+        font-size: 6vw;
+        max-width: 60px;
+        max-height: 60px;
       }
     }
 
@@ -381,7 +375,9 @@
 
     <aside class="sidebar" aria-live="polite" aria-atomic="true">
       <div class="message-panel" id="message" aria-live="assertive">
+        <!-- win/lose message -->
         <span id="game-message"></span>
+        <!-- redirect message -->
         <span class="redirect-msg" id="redirect-msg">🔗 Redirecting you to learn more about HUB...</span>
       </div>
       <footer>

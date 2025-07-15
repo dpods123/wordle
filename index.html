@@ -13,29 +13,41 @@
       --color-absent: #3a3a3c;
       --color-panel-bg: rgba(40, 40, 40, 0.95);
       --color-panel-shadow: rgba(0, 0, 0, 0.6);
-      --color-win: #2e7d32;   /* nice green */
-      --color-lose: #c62828;  /* nice red */
-      --input-glow: rgba(46, 125, 50, 0.3); /* subtle green glow */
+      --color-win: #2e7d32;
+      --color-lose: #c62828;
+      --input-glow: rgba(46, 125, 50, 0.3);
     }
 
-    /* Reset & base */
     * {
       box-sizing: border-box;
     }
 
     body {
+      position: relative;
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--color-bg);
-      color: var(--color-text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       overflow-x: hidden;
+      font-family: Arial, sans-serif;
+      color: var(--color-text);
+
+      /* NYC Skyline background */
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+      background-size: cover;
+      z-index: 0;
     }
 
-    /* Container for main content + sidebar */
+    /* Dark overlay for readability */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(18, 18, 19, 0.75);
+      z-index: -1;
+    }
+
     .container {
       display: flex;
       flex-direction: row;
@@ -47,13 +59,12 @@
       flex-wrap: nowrap;
     }
 
-    /* Left side: game + header */
     .main-content {
       flex: 1 1 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 0; /* for flexbox shrinking */
+      min-width: 0;
     }
 
     h1 {
@@ -77,7 +88,6 @@
       color: #ccc;
     }
 
-    /* Grid container */
     .grid {
       display: grid;
       grid-template-rows: repeat(4, 1fr);
@@ -87,7 +97,6 @@
       margin-bottom: 1.2em;
     }
 
-    /* Each row of 5 tiles */
     .row {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -95,7 +104,6 @@
       justify-content: center;
     }
 
-    /* Each tile */
     .tile {
       width: 60px;
       height: 60px;
@@ -115,7 +123,6 @@
       perspective: 1000px;
     }
 
-    /* Color feedback */
     .correct {
       background-color: var(--color-correct);
       border-color: var(--color-correct);
@@ -134,7 +141,6 @@
       color: white;
     }
 
-    /* Flip animation */
     @keyframes flip {
       0% {
         transform: rotateX(0deg);
@@ -157,7 +163,6 @@
       backface-visibility: hidden;
     }
 
-    /* Input + button form */
     form {
       display: flex;
       justify-content: center;
@@ -183,7 +188,6 @@
       transition: box-shadow 0.6s ease;
     }
 
-    /* Subtle green glow on input */
     input[type="text"]:focus {
       box-shadow: 0 0 6px 2px var(--input-glow);
     }
@@ -209,7 +213,6 @@
       cursor: not-allowed;
     }
 
-    /* Sidebar container for logo + messages */
     .sidebar {
       width: 280px;
       display: flex;
@@ -220,7 +223,6 @@
       position: relative;
     }
 
-    /* HUB logo aligned left */
     footer {
       width: 100%;
       display: flex;
@@ -244,7 +246,6 @@
       cursor: pointer;
     }
 
-    /* Messages panel (win/lose and redirect) */
     .message-panel {
       background: var(--color-panel-bg);
       box-shadow: 0 0 12px var(--color-panel-shadow);
@@ -270,7 +271,6 @@
       line-height: 1.4;
     }
 
-    /* Show message panel with color variant */
     .message-panel.show {
       opacity: 1;
       transform: translateX(0);
@@ -289,7 +289,6 @@
       color: white;
     }
 
-    /* Smaller font for redirect message inside */
     .redirect-msg {
       margin-top: 0.6em;
       font-size: 14px;
@@ -298,7 +297,6 @@
       display: none;
     }
 
-    /* Responsive */
     @media (max-width: 720px) {
       .container {
         flex-direction: column;
@@ -343,7 +341,6 @@
         max-height: 60px;
       }
     }
-
   </style>
 </head>
 <body>
@@ -375,9 +372,7 @@
 
     <aside class="sidebar" aria-live="polite" aria-atomic="true">
       <div class="message-panel" id="message" aria-live="assertive">
-        <!-- win/lose message -->
         <span id="game-message"></span>
-        <!-- redirect message -->
         <span class="redirect-msg" id="redirect-msg">🔗 Redirecting you to learn more about HUB...</span>
       </div>
       <footer>
@@ -406,7 +401,6 @@
     let currentRow = 0;
     let gameOver = false;
 
-    // Initialize grid rows and tiles
     for (let i = 0; i < maxAttempts; i++) {
       const row = document.createElement("div");
       row.className = "row";
@@ -420,7 +414,6 @@
       grid.appendChild(row);
     }
 
-    // Hide message panel initially
     messagePanel.classList.remove("show");
     redirectMsg.style.display = "none";
 
@@ -435,15 +428,12 @@
         return;
       }
 
-      // Get tiles for current row
       const row = grid.children[currentRow];
       const tiles = row.querySelectorAll(".tile");
 
-      // Disable input while flipping
       input.disabled = true;
       submitBtn.disabled = true;
 
-      // Reveal letter-by-letter with delay
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           const letter = guess[i];
@@ -451,7 +441,6 @@
           tile.textContent = letter.toUpperCase();
           tile.classList.add("flip");
 
-          // After flip animation ends, add correct class
           tile.addEventListener("animationend", () => {
             tile.classList.remove("flip");
 
@@ -466,7 +455,6 @@
               tile.setAttribute("aria-label", letter.toUpperCase() + " is absent");
             }
 
-            // When last tile finishes
             if (i === 4) {
               input.disabled = false;
               submitBtn.disabled = false;
@@ -483,36 +471,45 @@
 
     function checkGameEnd(guess) {
       if (guess === correctWord) {
-        showMessage("Congratulations! You cracked the HUB code.", true);
+        showGameResult(true);
       } else if (currentRow >= maxAttempts) {
-        showMessage(`Game Over! The word was "${correctWord.toUpperCase()}".`, false);
+        showGameResult(false);
       }
     }
 
-    function showMessage(text, won) {
+    function showGameResult(win) {
       gameOver = true;
-      gameMessage.textContent = text;
-      redirectMsg.style.display = "block";
       messagePanel.classList.add("show");
-      messagePanel.classList.remove("win", "lose");
-      messagePanel.classList.add(won ? "win" : "lose");
+      if (win) {
+        messagePanel.classList.add("win");
+        messagePanel.classList.remove("lose");
+        gameMessage.textContent = "🎉 Congratulations! You cracked the code!";
+      } else {
+        messagePanel.classList.add("lose");
+        messagePanel.classList.remove("win");
+        gameMessage.textContent = `💥 Game Over! The correct word was "${correctWord.toUpperCase()}".`;
+      }
 
-      // Redirect after 5 seconds
       setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 5000);
+        redirectMsg.style.display = "block";
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 3000);
+      }, 1200);
     }
 
-    function showTemporaryMessage(text, type) {
-      gameMessage.textContent = text;
+    let tempMsgTimeout;
+    function showTemporaryMessage(msg, type) {
+      gameMessage.textContent = msg;
       messagePanel.classList.add("show");
       messagePanel.classList.remove("win", "lose");
-      messagePanel.classList.add(type);
+      redirectMsg.style.display = "none";
 
-      setTimeout(() => {
+      clearTimeout(tempMsgTimeout);
+      tempMsgTimeout = setTimeout(() => {
+        messagePanel.classList.remove("show");
         gameMessage.textContent = "";
-        messagePanel.classList.remove("show", type);
-      }, 3000);
+      }, 2000);
     }
   </script>
 </body>

@@ -21,9 +21,6 @@
     /* Reset & base */
     * {
       box-sizing: border-box;
-      /* Add these for better font rendering consistency if needed */
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
@@ -36,8 +33,6 @@
       flex-direction: column;
       justify-content: flex-start;
       overflow-x: hidden;
-      /* Prevent unwanted scaling/zooming on orientation change on some mobiles */
-      -webkit-text-size-adjust: 100%;
     }
 
     /* Container for main content + sidebar */
@@ -59,8 +54,6 @@
       flex-direction: column;
       align-items: center;
       min-width: 0; /* for flexbox shrinking */
-      /* Add padding-bottom to ensure space below grid, preventing keyboard overlap */
-      padding-bottom: 20vh; /* Adjust as needed, makes sure content has room to scroll */
     }
 
     h1 {
@@ -120,8 +113,6 @@
       transform-origin: center;
       color: var(--color-text);
       perspective: 1000px;
-      /* Explicit line-height for desktop for consistency */
-      line-height: 60px; /* Make line-height equal to height for perfect vertical centering */
     }
 
     /* Color feedback */
@@ -190,8 +181,6 @@
       text-align: center;
       box-shadow: 0 0 6px 2px transparent;
       transition: box-shadow 0.6s ease;
-      background-color: #333; /* Darker background for contrast */
-      color: var(--color-text);
     }
 
     /* Subtle green glow on input */
@@ -265,31 +254,26 @@
       color: #eee;
       font-size: 18px;
       padding: 1.2em 1.4em;
-      /* Crucial: Ensure it's truly off-screen when hidden */
       opacity: 0;
-      pointer-events: none; /* Make it unclickable when hidden */
-      position: absolute; /* Take it out of normal flow */
-      top: 0;
-      left: 150%; /* Start far off-screen */
-      transform: translateX(0); /* Reset transform for 'show' class animation */
-      transition:
+      transform: translateX(150%);
+      transition: 
+        transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
         opacity 0.5s ease,
-        left 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
         background-color 0.5s ease;
       display: flex;
       flex-direction: column;
       justify-content: center;
       user-select: none;
+      pointer-events: none;
       text-align: left;
       font-weight: 600;
       line-height: 1.4;
-      z-index: 100; /* Ensure it's above other content when visible */
     }
 
     /* Show message panel with color variant */
     .message-panel.show {
       opacity: 1;
-      left: 0; /* Slide in from left */
+      transform: translateX(0);
       pointer-events: auto;
     }
 
@@ -320,95 +304,52 @@
         flex-direction: column;
         padding: 1em 1em 2em;
         max-width: 100%;
-        gap: 1em; /* Reduce gap on mobile */
-      }
-      .main-content {
-        padding-bottom: 2em; /* Reduced padding for mobile to allow more screen space */
       }
       .sidebar {
         width: 100%;
         min-width: auto;
         flex-direction: row;
-        justify-content: center; /* Center items on mobile */
+        justify-content: space-between;
         align-items: center;
         gap: 1em;
         margin-top: 1.5em;
-        flex-wrap: wrap; /* Allow items to wrap */
-        position: relative; /* Make sidebar a positioning context for panel */
-        min-height: 100px; /* Ensure sidebar has some height even if panel is hidden */
       }
       .message-panel {
-        /* Mobile specific positioning */
-        position: absolute; /* Keep it absolute within sidebar */
-        top: 0;
-        left: 50%; /* Center horizontally */
-        transform: translateX(-50%); /* Adjust to truly center */
-        width: 90vw; /* Take most of viewport width */
-        max-width: 350px; /* Limit max size */
+        width: auto;
         min-height: 80px;
         font-size: 16px;
         padding: 1em 1.2em;
-        opacity: 0; /* Hidden by default */
-        pointer-events: none;
-        transition:
-          opacity 0.5s ease,
-          transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-          background-color 0.5s ease;
-      }
-      .message-panel.show {
-        opacity: 1;
-        transform: translateX(-50%); /* Stays centered */
-        pointer-events: auto;
-      }
-
-      footer {
-        width: 100%; /* Take full width on mobile */
-        display: flex;
-        justify-content: center; /* Center logo horizontally */
-        align-items: center;
-        margin-top: 1em; /* Add space below if message panel is above */
+        flex: 1;
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
       }
       footer img {
         max-width: 140px;
-        filter: brightness(1.2); /* Re-apply filter if needed, just for safety */
-        box-shadow: 0 0 8px rgba(83, 141, 78, 0.5); /* Smaller shadow on mobile */
-        margin-left: 0; /* Override auto-margin from previous attempt */
       }
       form {
         max-width: 280px;
         gap: 0.5em;
-        margin-top: 1.5em; /* More space above the form */
-        margin-bottom: 0.5em; /* Less space below */
       }
-
-      /* --- CRITICAL: REVISED GRID AND TILE STYLES FOR MOBILE --- */
       .grid {
-        width: 90vw; /* Take 90% of viewport width */
-        max-width: 300px; /* Limit the max width for the grid */
+        width: 90vw; 
+        max-width: 320px; 
         margin-left: auto;
         margin-right: auto;
-        gap: 6px; /* Reduced gap for a tighter look on mobile */
+        gap: 8px; 
       }
-
       .row {
-        gap: 6px; /* Match row gap with grid gap */
+        gap: 8px; 
       }
-
       .tile {
-        /* Directly set vw based size for width and height */
-        /* Calculation: (Grid width - (4 * gap)) / 5 tiles */
-        /* Example: (90vw - (4 * 6px)) / 5 = 18vw - 4.8px. A simpler vw value: */
-        width: 16.5vw; /* Adjusted for better fit, considering gaps */
-        height: 16.5vw; /* Maintain square aspect ratio */
-        font-size: 6vw; /* Scale font size with tile size */
-        line-height: 16.5vw; /* Match line-height to tile height for vertical centering */
-        /* Ensure it doesn't exceed desktop tile size */
-        max-width: 54px;
-        max-height: 54px;
-        font-size: 26px; /* Set a fixed font size if vw proves problematic. Test with 6vw first. */
-        line-height: 54px; /* Adjust line-height if using fixed font size */
+        width: 18vw; 
+        height: 18vw; 
+        font-size: 8vw; 
+        max-width: 58px; 
+        max-height: 58px; 
       }
     }
+
   </style>
 </head>
 <body>
@@ -463,7 +404,6 @@
     const redirectMsg = document.getElementById("redirect-msg");
     const input = document.getElementById("guess");
     const submitBtn = document.getElementById("submitBtn");
-    const mainContent = document.querySelector('.main-content'); // Get main content area
 
     const redirectUrl = "hub.html";
 
@@ -484,7 +424,7 @@
       grid.appendChild(row);
     }
 
-    // Hide message panel initially (ensures it's hidden on load on all devices)
+    // Hide message panel initially
     messagePanel.classList.remove("show");
     redirectMsg.style.display = "none";
 
@@ -506,13 +446,6 @@
       // Disable input while flipping
       input.disabled = true;
       submitBtn.disabled = true;
-
-      // Scroll the main content (or grid) into view if needed after guess
-      // This helps counteract keyboard pushing up content
-      if (window.innerWidth <= 720) {
-          mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
 
       // Reveal letter-by-letter with delay
       for (let i = 0; i < 5; i++) {
@@ -568,11 +501,6 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(won ? "win" : "lose");
 
-      // Scroll to message panel if it's not fully in view on mobile
-      if (window.innerWidth <= 720) {
-        messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
       // Redirect after 5 seconds
       setTimeout(() => {
         window.location.href = redirectUrl;
@@ -585,26 +513,11 @@
       messagePanel.classList.remove("win", "lose");
       messagePanel.classList.add(type);
 
-      // Scroll to message panel if it's not fully in view on mobile
-      if (window.innerWidth <= 720) {
-        messagePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
       setTimeout(() => {
-        // Hide the message after the temporary duration
+        gameMessage.textContent = "";
         messagePanel.classList.remove("show", type);
-        gameMessage.textContent = ""; // Clear message text
       }, 3000);
     }
-
-    // Optional: Add event listener to scroll to input on focus for mobile
-    input.addEventListener('focus', () => {
-      if (window.innerWidth <= 720) {
-        // Scroll the form into view. The grid is above, so this will usually keep it visible.
-        document.querySelector('form').scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
-    });
-
   </script>
 </body>
 </html>

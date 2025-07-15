@@ -298,6 +298,25 @@
       display: none;
     }
 
+    /* iPhone specific fix for grid and tiles */
+    @media only screen 
+      and (min-device-width: 320px) 
+      and (max-device-width: 430px) 
+      and (-webkit-min-device-pixel-ratio: 2) {
+      
+      .grid {
+        max-width: 300px;  /* slightly smaller max-width */
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .tile {
+        width: 54px !important;
+        height: 54px !important;
+        font-size: 24px !important;
+      }
+    }
+
     /* Responsive */
     @media (max-width: 720px) {
       .container {
@@ -431,129 +450,89 @@
       const guess = input.value.trim().toLowerCase();
 
       if (guess.length !== 5) {
-        showTemporaryMessage("❗ Guess must be exactly 5 letters.");
+        showTemporaryMessage("Please enter exactly 5 letters.", "absent");
         return;
       }
 
+      // Get tiles for current row
       const row = grid.children[currentRow];
-      const feedback = getFeedback(guess, correctWord);
+      const tiles = row.querySelectorAll(".tile");
 
-      // Reveal tiles with flip animation & feedback colors
-      for (let i = 0; i < 5; i++) {
-        const tile = row.children[i];
-        tile.textContent = guess[i].toUpperCase();
-
-        // Remove previous classes to retrigger animation if needed
-        tile.classList.remove("flip", "correct", "present", "absent");
-
-        setTimeout(() => {
-          tile.classList.add("flip");
-          tile.classList.add(feedback[i]);
-          tile.setAttribute("aria-label", `${guess[i].toUpperCase()} is ${feedback[i]}`);
-        }, i * 300);
-      }
-
-      if (guess === correctWord) {
-        showMessage("🎉 Congratulations! You cracked the HUB code!", true);
-        showRedirectMessage();
-        endGame();
-        return;
-      }
-
-      currentRow++;
-
-      if (currentRow >= maxAttempts) {
-        showMessage(`❌ Game over! The correct word was: ${correctWord.toUpperCase()}`, false);
-        showRedirectMessage();
-        endGame();
-      }
-
-      input.value = "";
-      input.focus();
-    }
-
-    // Show message with green (win) or red (lose) panel background
-    function showMessage(text, win = null) {
-      gameMessage.textContent = text;
-      messagePanel.classList.add("show");
-
-      // Remove any previous win/lose classes
-      messagePanel.classList.remove("win", "lose");
-
-      if (win === true) {
-        messagePanel.classList.add("win");
-      } else if (win === false) {
-        messagePanel.classList.add("lose");
-      }
-    }
-
-    // Show temporary message under the input for invalid guesses (not game ending)
-    function showTemporaryMessage(text) {
-      gameMessage.textContent = text;
-      // Show for 2 seconds but no color panel or permanent box
-      messagePanel.classList.add("show");
-      messagePanel.classList.remove("win", "lose");
-      redirectMsg.style.display = "none";
-
-      setTimeout(() => {
-        if (!gameOver) {
-          messagePanel.classList.remove("show");
-          gameMessage.textContent = "";
-        }
-      }, 2000);
-    }
-
-    // Show the redirect message below main message
-    function showRedirectMessage() {
-      redirectMsg.style.display = "block";
-    }
-
-    // End game disables input and submit button
-    function endGame() {
-      gameOver = true;
+      // Disable input while flipping
       input.disabled = true;
       submitBtn.disabled = true;
-      // Optionally redirect after 4 seconds
+
+      // Reveal letter-by-letter with delay
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const letter = guess[i];
+          const tile = tiles[i];
+          tile.textContent = letter.toUpperCase();
+          tile.classList.add("flip");
+
+          // After flip animation ends, add correct class
+          tile.addEventListener("animationend", () => {
+            tile.classList.remove("flip");
+
+            if (letter === correctWord[i]) {
+              tile.classList.add("correct");
+              tile.setAttribute("aria-label", letter.toUpperCase() + " is correct");
+            } else if (correctWord.includes(letter)) {
+              tile.classList.add("present");
+              tile.setAttribute("aria-label", letter.toUpperCase() + " is present");
+            } else {
+              tile.classList.add("absent");
+              tile.setAttribute("aria-label", letter.toUpperCase() + " is absent");
+            }
+
+            // When last tile finishes
+            if (i === 4) {
+              input.disabled = false;
+              submitBtn.disabled = false;
+              input.value = "";
+              input.focus();
+
+              currentRow++;
+              checkGameEnd(guess);
+            }
+          }, { once: true });
+        }, i * 400);
+      }
+    }
+
+    function checkGameEnd(guess) {
+      if (guess === correctWord) {
+        showMessage("Congratulations! You cracked the HUB code.", true);
+      } else if (currentRow >= maxAttempts) {
+        showMessage(`Game Over! The word was "${correctWord.toUpperCase()}".`, false);
+      }
+    }
+
+    function showMessage(text, won) {
+      gameOver = true;
+      gameMessage.textContent = text;
+      redirectMsg.style.display = "block";
+      messagePanel.classList.add("show");
+      messagePanel.classList.remove("win", "lose");
+      messagePanel.classList.add(won ? "win" : "lose");
+
+      // Redirect after 5 seconds
       setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 4000);
+      }, 5000);
     }
 
-    // Return feedback for guess letters: 'correct', 'present', or 'absent'
-    function getFeedback(guess, answer) {
-      const feedback = Array(5).fill("absent");
-      const answerLetters = answer.split("");
-      const guessLetters = guess.split("");
+    function showTemporaryMessage(text, type) {
+      gameMessage.textContent = text;
+      messagePanel.classList.add("show");
+      messagePanel.classList.remove("win", "lose");
+      messagePanel.classList.add(type);
 
-      // First pass: correct letters
-      for (let i = 0; i < 5; i++) {
-        if (guessLetters[i] === answerLetters[i]) {
-          feedback[i] = "correct";
-          answerLetters[i] = null; // remove matched letter
-          guessLetters[i] = null;
-        }
-      }
-
-      // Second pass: present letters
-      for (let i = 0; i < 5; i++) {
-        if (guessLetters[i] !== null) {
-          const index = answerLetters.indexOf(guessLetters[i]);
-          if (index > -1) {
-            feedback[i] = "present";
-            answerLetters[index] = null;
-          }
-        }
-      }
-
-      return feedback;
+      setTimeout(() => {
+        gameMessage.textContent = "";
+        messagePanel.classList.remove("show", type);
+      }, 3000);
     }
-
-    // On page load: hide message panel and focus input
-    window.onload = () => {
-      messagePanel.classList.remove("show");
-      redirectMsg.style.display = "none";
-      input.focus();
-    };
   </script>
 </body>
 </html>

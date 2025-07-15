@@ -320,6 +320,7 @@
         font-size: 16px;
         padding: 1em 1.2em;
         flex: 1;
+        /* Important: Override translateX and opacity for mobile */
         transform: translateX(0) !important;
         opacity: 1 !important;
         pointer-events: auto !important;
@@ -331,25 +332,42 @@
         max-width: 280px;
         gap: 0.5em;
       }
+
+      /* --- MODIFIED GRID AND TILE STYLES FOR MOBILE --- */
       .grid {
-        width: 90vw; 
-        max-width: 320px; 
+        /* Set a more flexible width for the grid container itself */
+        width: 90vw; /* Takes 90% of viewport width */
+        max-width: 320px; /* But doesn't get wider than 320px on larger mobile views */
         margin-left: auto;
         margin-right: auto;
-        gap: 8px; 
+        /* Use fixed pixel gap for consistency */
+        gap: 8px; /* Consistent gap between rows */
       }
+
       .row {
-        gap: 8px; 
+        display: grid; /* Keep using grid for the row layout */
+        /* Distribute columns evenly with fixed gap */
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px; /* Consistent gap between tiles within a row */
       }
+
       .tile {
-        width: 18vw; 
-        height: 18vw; 
-        font-size: 8vw; 
-        max-width: 58px; 
-        max-height: 58px; 
+        /* Use 'fr' units from grid-template-columns, and set aspect ratio */
+        width: auto; /* Let grid-template-columns determine width */
+        height: 0; /* Set height to 0 initially */
+        padding-bottom: 100%; /* Use padding-bottom trick for square aspect ratio (100% of its width) */
+        font-size: 6vw; /* Scale font size relative to viewport width */
+        
+        /* Re-center content vertically and horizontally within the new 'square' tile */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        /* Ensure max-width/height are still respected as a ceiling */
+        max-width: 60px; /* Prevent tiles from becoming too big on wider mobile views */
+        max-height: 60px; /* Match max-width */
       }
     }
-
   </style>
 </head>
 <body>

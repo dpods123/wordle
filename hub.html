@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>HUB Networking Evening at Eataly Flatiron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -83,6 +84,40 @@
       font-size: 1.2em;
       text-align: center;
     }
+
+    /* Responsive adjustments for phones */
+    @media (max-width: 480px) {
+      body {
+        padding: 1em;
+      }
+
+      .hero {
+        height: 40vh;
+        padding: 0 1em;
+      }
+
+      .hero h1 {
+        font-size: 2em;
+        padding: 0.3em 0.6em;
+      }
+
+      main {
+        flex-direction: column;
+        padding: 1em;
+        gap: 1em;
+      }
+
+      .info, form {
+        max-width: 100%;
+        padding: 1em;
+      }
+
+      button {
+        width: 100%;
+        font-size: 1.2em;
+        padding: 1em;
+      }
+    }
   </style>
 </head>
 <body>
@@ -108,16 +143,16 @@
 
     <form id="rsvpForm" action="https://your-backend.example.com/hub-rsvp" method="post">
       <label for="name">Full Name *</label>
-      <input type="text" id="name" name="name" required placeholder="Jane Doe">
+      <input type="text" id="name" name="name" required placeholder="Jane Doe" />
 
       <label for="email">Work Email *</label>
-      <input type="email" id="email" name="email" required placeholder="jane@company.com">
+      <input type="email" id="email" name="email" required placeholder="jane@company.com" />
 
       <label for="company">Company *</label>
-      <input type="text" id="company" name="company" required placeholder="Company Name">
+      <input type="text" id="company" name="company" required placeholder="Company Name" />
 
       <label for="title">Title *</label>
-      <input type="text" id="title" name="title" required placeholder="Your Role">
+      <input type="text" id="title" name="title" required placeholder="Your Role" />
 
       <label for="goals">Your Objective (optional)</label>
       <textarea id="goals" name="goals" rows="3" placeholder="E.g., explore partnerships or learn about X"></textarea>
